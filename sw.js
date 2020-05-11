@@ -1,6 +1,8 @@
 const cacheName = 'cache-v1';
 const staticAssets = [
     './',
+    './images/icon-512x512.png',
+    './images/icon-192x192.png',
     './index.html',
     './index.js',
     './firebase.js',
@@ -18,32 +20,7 @@ self.addEventListener('activate', e =>{
     self.clients.claim();
 });
 
-self.addEventListener('fetch', async e =>{
-    const request = e.request;
-    const url = new URL(request.url);
-    if(request['method']==='GET'){
-        if(url.origin === location.origin) {
-            e.respondWith(cacheFirst(request));
-        } else{
-            e.respondWith(networkAndCache(request));
-        }
-    }
+self.addEventListener('fetch', e =>{
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
 
-async function cacheFirst(request) {
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
-    return cached || fetch(request)
-}
-
-async function networkAndCache(request){
-    const cache = await caches.open(cacheName);
-    try{
-        const newCache = await fetch(request);
-        await cache.put(request, newCache.clone());
-        return newCache;
-    } catch (e){
-        const cached = await cache.match(request);
-        return cached;
-    }
-}
