@@ -1,18 +1,16 @@
-var mailUser = '';
+var USERMAIL = '';
+
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
+        showChat()
         user = firebase.auth().currentUser
-        console.log('hola')
-        window.alert(user.name)
-
+        USERMAIL = user['email']
     }
     else{
-        window.alert(' funciona')
-
-        mailUser = ''
+        showLogin()
+        USERMAIL = ''
     }
-
 });
 
 firebase.database().ref('chat').on('value', function(snapshot) {
@@ -21,7 +19,7 @@ firebase.database().ref('chat').on('value', function(snapshot) {
         element = element.val();
         username = element.name;
         message = element.message;
-        html += `<li><b> ${username} ${message} </li></b>`;
+        html += `<li><b> ${username}    ${message} </li></b>`;
     });
     messages = document.getElementById('messages');
     messages.innerHTML = html 
@@ -51,6 +49,7 @@ function showChat(){
 function login(){
     email = document.getElementById('email-login').value;
     password = document.getElementById('password-login').value;
+    document.getElementById('password-login').value = ''
     showChat();
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
         var errorCode = error.code;
@@ -73,19 +72,19 @@ function createaccount(){
       });
 }
 
+
 function logout(){
     firebase.auth().signOut().then(function() {
         showLogin()
     }).catch(function() {
-
     })
 }
 
-
 function send(){
+    console.log(USERMAIL, 'en el send')
     message = document.getElementById('message').value;
     firebase.database().ref('chat').push({
-        name: name,
+        name: USERMAIL,
         message: message
     });
     document.getElementById('message').value = ''
