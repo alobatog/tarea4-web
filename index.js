@@ -25,6 +25,20 @@ firebase.database().ref('chat').on('value', function(snapshot) {
     messages.innerHTML = html 
 });
 
+window.addEventListener('load', () => {
+    registerSW();
+})
+
+async function registerSW(){
+    if('serviceWorker' in navigator){
+        try{
+            await navigator.serviceWorker.register('./sw.js')
+        } catch(e){
+            console.log('falle')
+        }
+    }
+}
+
 function showSignup(){
     document.getElementById('signup').style.display = 'initial';
     document.getElementById('login').style.display = 'none';
@@ -81,7 +95,6 @@ function logout(){
 }
 
 function send(){
-    console.log(USERMAIL, 'en el send')
     message = document.getElementById('message').value;
     firebase.database().ref('chat').push({
         name: USERMAIL,
