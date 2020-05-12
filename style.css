@@ -24,6 +24,12 @@ html, body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f6f6', endColorstr='#ffffff', GradientType=0 );
 }
 
+.error-msg {
+    color: red;
+    margin: 0;
+    display: none;
+}
+
 .form {
     display: flex;
     flex-direction: column;

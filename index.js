@@ -64,9 +64,52 @@ function login(){
         });
 }
 
+function showErrorMsg(msg, id){
+    document.getElementById(id).style.display = 'initial'; 
+    document.getElementById(id).textContent = msg;
+}
+
+function cleanErrorMsg(id){
+    document.getElementById(id).style.display = 'none'; 
+}
+
+function validateEmail(email){
+    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if(email.match(mailformat)){
+        return true;
+    }
+    return false;
+}
+
 function createaccount(){
     email = document.getElementById('email-signup').value;
     password = document.getElementById('password-signup').value;
+    password_confirmation = document.getElementById('password-confirmation-signup').value;
+    //input validation before creating user
+    errors = 0
+    if (!validateEmail(email)){
+        showErrorMsg("Email invalido", 'email-error');
+        errors += 1;
+    }
+    else {
+        cleanErrorMsg('email-error');
+    }
+    if (password !== password_confirmation){
+        showErrorMsg("Las contraseñas no coinciden", "confirmation-error");
+        errors += 1;
+    }
+    else {
+        cleanErrorMsg("confirmation-error")
+    }
+    if (password.length < 5){
+        showErrorMsg("Contraseña muy corta", "password-error")
+        errors += 1
+    }
+    else {
+        cleanErrorMsg("password-error")
+    }
+    if (errors !== 0) return;
+    //after input validation create user
     firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(() => showElement("chat"))
         .catch(function(error) {

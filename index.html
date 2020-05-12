@@ -27,9 +27,14 @@
           <h1>Sign up</h1>
           <div class="form">
             <label for="email-signup">Email</label>
+            <p class="error-msg" id='email-error'></p>
             <input type="email" placeholder='email' id='email-signup'>
             <label for="password-signup">Contraseña</label>
+            <p class="error-msg" id='password-error'></p>
             <input type="password" placeholder='contraseña' id='password-signup'>
+            <label for="password-signup">Confirmar contraseña</label>
+            <p class="error-msg" id='confirmation-error'></p>
+            <input type="password" placeholder='contraseña' id='password-confirmation-signup'>
             <button onclick="createaccount()">Crear cuenta</button>
           </div>
       </div>
