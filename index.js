@@ -1,15 +1,20 @@
-var USERMAIL = '';
-
+let USERMAIL = '';
+const elements = [
+    "loading",
+    "login",
+    "signup",
+    "chat",
+];
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-        showChat()
-        user = firebase.auth().currentUser
-        USERMAIL = user['email']
+        showElement("chat");
+        user = firebase.auth().currentUser;
+        USERMAIL = user['email'];
     }
     else{
-        showLogin()
-        USERMAIL = ''
+        showElement("login");
+        USERMAIL = '';
     }
 });
 
@@ -19,10 +24,10 @@ firebase.database().ref('chat').on('value', function(snapshot) {
         element = element.val();
         username = element.name;
         message = element.message;
-        html += `<li><b> ${username}    ${message} </li></b>`;
+        html += `<li><b>${username.split("@")[0]}:</b>    ${message} </li>`;
     });
     messages = document.getElementById('messages');
-    messages.innerHTML = html 
+    messages.innerHTML = html
 });
 
 window.addEventListener('load', () => {
@@ -34,62 +39,46 @@ async function registerSW(){
         try{
             await navigator.serviceWorker.register('./sw.js')
         } catch(e){
-            console.log('falle')
+            console.log('ERROR registering ServiceWorker')
         }
     }
 }
 
-function showSignup(){
-    document.getElementById('signup').style.display = 'initial';
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('chat').style.display = 'none';
+function showElement(elementId) {
+    elements.filter(el => el !== elementId).forEach(element => {
+        document.getElementById(element).style.display = "none";
+    });
+    document.getElementById(elementId).style.display = "initial";
 }
-
-
-function showLogin(){
-    document.getElementById('chat').style.display = 'none';
-    document.getElementById('signup').style.display = 'none';
-    document.getElementById('login').style.display = 'initial';
-}
-
-
-function showChat(){
-    document.getElementById('chat').style.display = 'initial';
-    document.getElementById('signup').style.display = 'none';
-    document.getElementById('login').style.display = 'none';
-}
-
 
 function login(){
     email = document.getElementById('email-login').value;
     password = document.getElementById('password-login').value;
     document.getElementById('password-login').value = ''
-    showChat();
-    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        window.alert( `${errorCode} ${errorMessage}`)
-        showLogin();
-      });
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => showElement("chat"))
+        .catch(function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            window.alert(`${errorCode} ${errorMessage}`);
+        });
 }
-
 
 function createaccount(){
     email = document.getElementById('email-signup').value;
     password = document.getElementById('password-signup').value;
-    showChat();
-    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        window.alert( `${errorCode} ${errorMessage}`)
-        showSignup();
-      });
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => showElement("chat"))
+        .catch(function(error) {
+            let errorCode = error.code;
+            let errorMessage = error.message;
+            window.alert( `${errorCode} ${errorMessage}`);
+        });
 }
-
 
 function logout(){
     firebase.auth().signOut().then(function() {
-        showLogin()
+        showElement("login");
     }).catch(function() {
     })
 }
@@ -102,4 +91,3 @@ function send(){
     });
     document.getElementById('message').value = ''
 }
-
