@@ -1,0 +1,23 @@
+{
+  "name": "tarea4-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "./node_modules/.bin/serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alobatog/tarea4-web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alobatog/tarea4-web/issues"
+  },
+  "homepage": "https://github.com/alobatog/tarea4-web#readme",
+  "dependencies": {
+    "serve": "^11.3.0"
+  }
+}

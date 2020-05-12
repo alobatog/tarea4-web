@@ -3,48 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chatgram</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
-    <div id='login'>
-        <h1>login</h1>
-        <label for="email-login">Email</label>
-        <input type="email" placeholder='email' id='email-login'>
-        <label for="password-login">Contraseña</label>
-        <input type="password" placeholder='contraseña' id='password-login'>
-        <button onclick="login()">login</button>    
-        <button onclick="showSignup()">signup</button>
+    <div id="app">
+      <div id="loading">
+          <h1>Cargando...</h1>
+      </div>
+      <div id='login'>
+          <h1>Login</h1>
+          <div class="form">
+            <label for="email-login">Email</label>
+            <input type="email" placeholder='email' id='email-login'>
+            <label for="password-login">Contraseña</label>
+            <input type="password" placeholder='contraseña' id='password-login'>
+            <button onclick="login()">login</button>
+            <button onclick="showElement('signup')">signup</button>
+          </div>
+      </div>
+      <div id="signup">
+          <h1>Sign up</h1>
+          <div class="form">
+            <label for="email-signup">Email</label>
+            <input type="email" placeholder='email' id='email-signup'>
+            <label for="password-signup">Contraseña</label>
+            <input type="password" placeholder='contraseña' id='password-signup'>
+            <button onclick="createaccount()">Crear cuenta</button>
+          </div>
+      </div>
+      <div id='chat'>
+          <h1>Chat</h1>
+          <ul id="messages"></ul>
+          <label for="message">Mensaje</label>
+          <input type="text" id='message'>
+          <button type="button" onclick="send()">Enviar</button>
+          <button type="button" onclick="logout()">Logout</button>
+      </div>
     </div>
-
-    <div id=signup>
-        <h1> Sign up</h1>
-        <label for="email-signup">Email</label>
-        <input type="email" placeholder='email' id='email-signup'>
-        <label for="password-signup">Contraseña</label>
-        <input type="password" placeholder='contraseña' id='password-signup'>
-        <button onclick="createaccount()">Crear cuenta</button>
-    </div>
-
-    <div id='chat'>
-        <h1>chat</h1>
-        <ul id="messages"></ul>    
-        <label for="message">Mensaje</label>
-        <input type="text" id='message'>
-        <button type="button" onclick="send()">Enviar</button>    
-        <button type="button" onclick="logout()">Logout</button>    
-
-    </div>
-    
-
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-database.js"></script>
     <script src="firebase.js"></script>
     <script src="index.js"></script>
-
-   
 </body>
 </html>
