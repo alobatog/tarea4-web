@@ -5,6 +5,22 @@ const elements = [
     "signup",
     "chat",
 ];
+let swRegistration = null;
+let indexedDB = null;
+
+function storeNewMessage(message) {
+    let store = indexedDB.transaction(["messages"], "readwrite").objectStore("messages");
+    store.add(message);
+}
+
+function sendNotification(element) {
+    console.log("SENDING");
+    const options = {
+        body: `1 New message from ${element.name}`,
+        icon: './images/icon-192x192.png',
+    };
+    swRegistration.showNotification("Chatgram New Notification", options);
+}
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -12,7 +28,7 @@ firebase.auth().onAuthStateChanged(function(user) {
         user = firebase.auth().currentUser;
         USERMAIL = user['email'];
     }
-    else{
+    else {
         showElement("login");
         USERMAIL = '';
     }
@@ -22,24 +38,68 @@ firebase.database().ref('chat').on('value', function(snapshot) {
     html = '';
     snapshot.forEach(element => {
         element = element.val();
+        let query = indexedDB.transaction(["messages"]).objectStore("messages").get(element.id);
+        query.onsuccess = function(event) {
+            if (!query.result) {
+                storeNewMessage(element);
+                sendNotification(element);
+            }
+        }
         username = element.name;
         message = element.message;
         html += `<li><b>${username.split("@")[0]}:</b>    ${message} </li>`;
     });
     messages = document.getElementById('messages');
-    messages.innerHTML = html
+    messages.innerHTML = html;
 });
 
 window.addEventListener('load', () => {
     registerSW();
 })
 
+function showNotification(message) {
+
+}
+
 async function registerSW(){
     if('serviceWorker' in navigator){
-        try{
-            await navigator.serviceWorker.register('./sw.js')
+        if ('PushManager' in window) {
+            if (window.Notification && Notification.permission === "granted") {
+                console.log("Push Notifications enabled");
+            } else if (window.Notification && Notification.permission !== "granted") {
+                Notification.requestPermission(status => {
+                    if (status === "granted") {
+                        console.log("Push Notifications enabled");
+                    } else {
+                        alert("Please enable notifications");
+                    }
+                });
+            } else {
+                alert("Please enable notifications");
+            }
+        } else {
+            console.log('Push Notifications is not supported');
+        }
+        try {
+            swRegistration = await navigator.serviceWorker.register('./sw.js');
+            window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+            if (window.indexedDB) {
+                let openRequest = window.indexedDB.open("database", 1);
+                openRequest.onsuccess = function(event) {
+                    indexedDB = openRequest.result;
+                }
+                openRequest.onupgradeneeded = function(event) {
+                    indexedDB = openRequest.result;
+                    let messages = indexedDB.createObjectStore("messages", { keyPath: "id" });
+                }
+                openRequest.onerror = function(event) {
+                    alert("Error opening database " + event.target.errorCode);
+                }
+            } else {
+                console.log("IndexedDB not supported");
+            }
         } catch(e){
-            console.log('ERROR registering ServiceWorker')
+            console.log('ERROR registering ServiceWorker');
         }
     }
 }
@@ -65,12 +125,12 @@ function login(){
 }
 
 function showErrorMsg(msg, id){
-    document.getElementById(id).style.display = 'initial'; 
+    document.getElementById(id).style.display = 'initial';
     document.getElementById(id).textContent = msg;
 }
 
 function cleanErrorMsg(id){
-    document.getElementById(id).style.display = 'none'; 
+    document.getElementById(id).style.display = 'none';
 }
 
 function validateEmail(email){
@@ -130,7 +190,8 @@ function send(){
     message = document.getElementById('message').value;
     firebase.database().ref('chat').push({
         name: USERMAIL,
-        message: message
+        message: message,
+        id: btoa(`${USERMAIL}${message}`),
     });
     document.getElementById('message').value = ''
 }
