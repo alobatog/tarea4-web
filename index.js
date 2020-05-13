@@ -42,7 +42,9 @@ firebase.database().ref('chat').on('value', function(snapshot) {
         query.onsuccess = function(event) {
             if (!query.result) {
                 storeNewMessage(element);
-                sendNotification(element);
+                if (!element.name.startsWith(USERMAIL)) {
+                    sendNotification(element);
+                }
             }
         }
         username = element.name;
