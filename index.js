@@ -13,19 +13,13 @@ function storeNewMessage(message) {
     store.add(message);
 }
 
-function sendNotification(messages) {
-    console.log(messages);
-    if (messages.length) {
-        console.log("Sending");
-        const body = messages.length === 1
-            ? `1 New message from ${messages[0].name}`
-            : `${messages.length} New messages`;
-        const options = {
-            body,
-            icon: './images/icon-192x192.png',
-        };
-        swRegistration.showNotification("Chatgram New Notification", options);
-    }
+function sendNotification(element) {
+    console.log("SENDING");
+    const options = {
+        body: `1 New message from ${element.name}`,
+        icon: './images/icon-192x192.png',
+    };
+    swRegistration.showNotification("Chatgram New Notification", options);
 }
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -42,14 +36,13 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 firebase.database().ref('chat').on('value', function(snapshot) {
     html = '';
-    let newMessages = [];
     snapshot.forEach(element => {
         element = element.val();
         let query = indexedDB.transaction(["messages"]).objectStore("messages").get(element.id);
         query.onsuccess = function(event) {
             if (!query.result) {
-                newMessages.push(element);
                 storeNewMessage(element);
+                sendNotification(element);
             }
         }
         username = element.name;
@@ -58,7 +51,6 @@ firebase.database().ref('chat').on('value', function(snapshot) {
     });
     messages = document.getElementById('messages');
     messages.innerHTML = html;
-    sendNotification(newMessages);
 });
 
 window.addEventListener('load', () => {
