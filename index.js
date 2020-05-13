@@ -1,10 +1,28 @@
 let USERMAIL = '';
+let MESSAGES = [];
+let ONLINE = true;
 const elements = [
     "loading",
     "login",
     "signup",
     "chat",
 ];
+
+window.addEventListener('online', () => {
+    ONLINE = true;
+    window.alert('Volvió el internet');
+    MESSAGES.forEach(message => {
+        firebase.database().ref('chat').push({
+            name: USERMAIL,
+            message: message
+        });
+    });
+    MESSAGES = [];
+});
+window.addEventListener('offline', () => {
+    window.alert('Estas sin internet');
+    ONLINE = false;
+});
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -37,9 +55,9 @@ window.addEventListener('load', () => {
 async function registerSW(){
     if('serviceWorker' in navigator){
         try{
-            await navigator.serviceWorker.register('./sw.js')
+            navigator.serviceWorker.register('./sw.js')
         } catch(e){
-            console.log('ERROR registering ServiceWorker')
+            console.log('ERROR registering ServiceWorker');
         }
     }
 }
@@ -128,9 +146,13 @@ function logout(){
 
 function send(){
     message = document.getElementById('message').value;
-    firebase.database().ref('chat').push({
-        name: USERMAIL,
-        message: message
-    });
     document.getElementById('message').value = ''
+    if(ONLINE){
+        firebase.database().ref('chat').push({
+            name: USERMAIL,
+            message: message
+        });
+    }else{
+        MESSAGES.push(message);
+    }
 }
